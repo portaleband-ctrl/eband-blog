@@ -1,16 +1,37 @@
 ---
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import '../styles/global.css';
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import "../styles/global.css";
+import { supabase } from "../lib/supabaseClient";
 
 interface Props {
-  title: string;
+  title?: string;
   description?: string;
   image?: string;
 }
 
-const { title, description = "Análises e recomendações de produtos", image = "/default-og.png" } = Astro.props;
-const currentUrl = new URL(Astro.url.pathname, Astro.site);
+const { data: settings } = await supabase.from("settings").select("*").single();
+
+const {
+  title: propTitle,
+  description: propDescription,
+  image = "/default-og.png",
+} = Astro.props;
+
+const blogName = settings?.blogName || "Blog.";
+const title = propTitle
+  ? `${propTitle}`
+  : `${blogName} | ${settings?.blogDescription || "Análises de Produtos"}`;
+const description =
+  propDescription ||
+  settings?.blogDescription ||
+  "Análises e recomendações de produtos";
+const favicon = settings?.blogFavicon || "/favicon.svg";
+
+const currentUrl = new URL(
+  Astro.url.pathname,
+  Astro.site || "https://eband.com.br",
+);
 ---
 
 <!doctype html>
@@ -18,9 +39,9 @@ const currentUrl = new URL(Astro.url.pathname, Astro.site);
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href={favicon} />
     <meta name="generator" content={Astro.generator} />
-    
+
     <!-- Primary Meta Tags -->
     <title>{title}</title>
     <meta name="title" content={title} />

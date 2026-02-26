@@ -1,0 +1,94 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import ArticleCard from "../../components/ArticleCard.astro";
+import { supabase } from "../../lib/supabaseClient";
+
+export async function getStaticPaths({ paginate }: { paginate: any }) {
+    const { data: rawArticles } = await supabase
+        .from("posts")
+        .select("*")
+        .eq("status", "published")
+        .order("published_at", { ascending: false });
+
+    const articles =
+        rawArticles?.map((post) => ({
+            ...post,
+            featuredImage: post.image_url,
+            featuredImageAlt: post.image_alt,
+            publishedAt: post.published_at,
+            author: post.author_name,
+        })) || [];
+
+    return paginate(articles, { pageSize: 12 });
+}
+
+interface Props {
+    page: any;
+}
+
+const { page } = Astro.props;
+---
+
+<Layout title={`Notícias - Página ${page.currentPage} | Blog.`}>
+    <div class="bg-white border-b border-gray-100 py-12 mb-12">
+        <div class="blog-container text-center">
+            <h1 class="text-3xl md:text-5xl font-black text-gray-900 mb-4">
+                Todas as <span class="text-[#3483FA]">Notícias</span>
+            </h1>
+            <p class="text-gray-500">
+                Página {page.currentPage} de {page.lastPage}
+            </p>
+        </div>
+    </div>
+
+    <div class="blog-container pb-24">
+        <div
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-16"
+        >
+            {page.data.map((article: any) => <ArticleCard article={article} />)}
+        </div>
+
+        <!-- Pagination Controls -->
+        <div
+            class="flex items-center justify-center gap-4 border-t border-gray-100 pt-12"
+        >
+            {
+                page.url.prev ? (
+                    <a
+                        href={page.url.prev}
+                        class="px-6 py-2 bg-white border border-gray-200 text-gray-700 font-bold rounded-full hover:border-[#3483FA] hover:text-[#3483FA] transition-all shadow-sm"
+                    >
+                        Anterior
+                    </a>
+                ) : (
+                    <span class="px-6 py-2 bg-gray-50 border border-gray-100 text-gray-300 font-bold rounded-full cursor-not-allowed">
+                        Anterior
+                    </span>
+                )
+            }
+
+            <div class="flex items-center gap-2">
+                <span class="text-sm font-bold text-gray-900"
+                    >{page.currentPage}</span
+                >
+                <span class="text-sm text-gray-400">/</span>
+                <span class="text-sm text-gray-400">{page.lastPage}</span>
+            </div>
+
+            {
+                page.url.next ? (
+                    <a
+                        href={page.url.next}
+                        class="px-6 py-2 bg-[#FFE600] text-[#2D3277] font-bold rounded-full hover:bg-[#FCD200] transition-all shadow-sm"
+                    >
+                        Próxima
+                    </a>
+                ) : (
+                    <span class="px-6 py-2 bg-gray-50 border border-gray-100 text-gray-300 font-bold rounded-full cursor-not-allowed">
+                        Próxima
+                    </span>
+                )
+            }
+        </div>
+    </div>
+</Layout>
