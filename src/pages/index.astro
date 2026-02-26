@@ -9,7 +9,7 @@ const { data: rawArticles } = await supabase
 	.select("*")
 	.eq("status", "published")
 	.order("published_at", { ascending: false })
-	.limit(12);
+	.limit(48);
 
 const articles =
 	rawArticles?.map((post) => ({

@@ -9,7 +9,7 @@ import react from '@astrojs/react';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://example.com',
+  site: 'https://eband.com.br',
   integrations: [mdx(), sitemap(), react()],
 
   vite: {
