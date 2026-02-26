@@ -1,0 +1,51 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { supabase } from "../lib/supabaseClient";
+
+const { data: categories } = await supabase
+    .from("categories")
+    .select("*")
+    .order("name");
+---
+
+<Layout title="Todas as Categorias | Blog.">
+    <div class="bg-white border-b border-gray-100 py-16 mb-12">
+        <div class="blog-container text-center">
+            <h1 class="text-4xl md:text-5xl font-black text-gray-900 mb-4">
+                Navegue por Categorias
+            </h1>
+            <p class="text-lg text-gray-500 max-w-2xl mx-auto">
+                Explore temas e encontre análises e reviews específicos para o
+                que você precisa.
+            </p>
+        </div>
+    </div>
+
+    <div class="blog-container pb-24">
+        {
+            categories && categories.length > 0 ? (
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    {categories.map((cat) => (
+                        <a
+                            href={`/categoria/${cat.slug}`}
+                            class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:border-[#3483FA]/40 transition-all group flex flex-col items-center justify-center text-center h-full"
+                        >
+                            <h3 class="font-bold text-gray-900 group-hover:text-[#3483FA] transition-colors text-lg capitalize mb-2">
+                                {cat.name}
+                            </h3>
+                            {cat.description && (
+                                <p class="text-sm text-gray-500 line-clamp-2">
+                                    {cat.description}
+                                </p>
+                            )}
+                        </a>
+                    ))}
+                </div>
+            ) : (
+                <div class="bg-gray-50 rounded-xl p-16 text-center text-gray-500 border border-gray-200">
+                    Nenhuma categoria encontrada.
+                </div>
+            )
+        }
+    </div>
+</Layout>

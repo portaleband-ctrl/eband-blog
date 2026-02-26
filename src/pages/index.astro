@@ -1,49 +1,113 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import Layout from "../layouts/Layout.astro";
+import ArticleCard from "../components/ArticleCard.astro";
+import { supabase } from "../lib/supabaseClient";
+
+// Server-side Data Fetching - Roda apenas no servidor = SEO Perfeito
+const { data: articles } = await supabase
+	.from("articles")
+	.select("*")
+	.eq("status", "published")
+	.order("publishedAt", { ascending: false })
+	.limit(12);
+
+const { data: categories } = await supabase
+	.from("categories")
+	.select("*")
+	.order("name");
+
+const featuredCategories = categories?.filter((c) => c.featured) || [];
+const displayCategories =
+	featuredCategories.length > 0
+		? featuredCategories
+		: categories?.slice(0, 8) || [];
+
+const mainArticles = articles || [];
+const featuredArticle = mainArticles.length > 0 ? mainArticles[0] : null;
+const recentArticles = mainArticles.slice(1);
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This template
-				serves as a lightweight, minimally-styled starting point for anyone looking to build a personal
-				website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to
-				<a href="https://docs.astro.build/">read the docs</a>
-				or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>
-				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
-		</main>
-		<Footer />
-	</body>
-</html>
+<Layout title="Home | Melhores Análises e Recomendações">
+	<!-- Categories Navbar -->
+	<div
+		class="bg-white border-b sticky top-[72px] z-40 hidden md:block shadow-sm"
+	>
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			<div
+				class="flex items-center gap-1.5 py-3 overflow-x-auto no-scrollbar"
+			>
+				<a
+					href="/"
+					class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold bg-[#3483FA]/10 text-[#3483FA] border border-[#3483FA] whitespace-nowrap"
+				>
+					Início
+				</a>
+
+				{
+					displayCategories.map((cat) => (
+						<a
+							href={`/categoria/${cat.slug}`}
+							class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-semibold bg-white border border-gray-300 text-gray-700 hover:border-[#3483FA] hover:text-[#3483FA] transition-all whitespace-nowrap"
+						>
+							{cat.name}
+						</a>
+					))
+				}
+
+				<a
+					href="/categorias"
+					class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-semibold bg-gray-50 border border-gray-200 text-gray-600 hover:bg-gray-100 transition-all whitespace-nowrap ml-1"
+				>
+					Ver todas
+				</a>
+			</div>
+		</div>
+	</div>
+
+	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+		<!-- Featured Article Section -->
+		<div class="mb-16">
+			<div class="flex items-center justify-between mb-8">
+				<h2
+					class="text-3xl font-black text-gray-900 tracking-tight flex items-center gap-3"
+				>
+					Destaque
+					<span
+						class="w-2 h-2 rounded-full bg-[#FFE600] animate-pulse"
+					></span>
+				</h2>
+			</div>
+
+			{
+				featuredArticle ? (
+					<ArticleCard article={featuredArticle} featured={true} />
+				) : (
+					<div class="bg-gray-50 rounded-xl p-8 text-center text-gray-500 border border-gray-200">
+						Nenhum artigo publicado ainda.
+					</div>
+				)
+			}
+		</div>
+
+		<!-- Recent Articles Section -->
+		<div class="mb-8">
+			<div class="flex items-center justify-between mb-8">
+				<h2
+					class="text-2xl md:text-3xl font-black text-gray-900 tracking-tight"
+				>
+					Mais <span class="text-[#3483FA]">Recentes</span>
+				</h2>
+			</div>
+
+			{
+				recentArticles.length > 0 ? (
+					<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+						{recentArticles.map((article) => (
+							<ArticleCard article={article} />
+						))}
+					</div>
+				) : null
+			}
+		</div>
+	</div>
+</Layout>

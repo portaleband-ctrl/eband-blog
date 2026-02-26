@@ -1,0 +1,51 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { supabase } from "../../lib/supabaseClient";
+
+export async function getStaticPaths() {
+    const { data: pages } = await supabase.from("pages").select("slug");
+
+    if (!pages) return [];
+
+    return pages.map((page) => ({
+        params: { slug: page.slug },
+    }));
+}
+
+const { slug } = Astro.params;
+
+const { data: page } = await supabase
+    .from("pages")
+    .select("*")
+    .eq("slug", slug)
+    .eq("status", "published")
+    .single();
+
+if (!page) {
+    return Astro.redirect("/404");
+}
+
+// Ensure SEO tags exist
+let finalContent = page.content;
+finalContent = finalContent.replace(
+    /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+    "",
+);
+---
+
+<Layout title={`${page.title} | Blog.`} description={page.title}>
+    <div class="blog-container py-16 pb-24 max-w-4xl">
+        <h1
+            class="text-3xl md:text-5xl font-black text-gray-900 leading-tight mb-12 tracking-tight text-center"
+        >
+            {page.title}
+        </h1>
+
+        <div
+            class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 md:p-12"
+        >
+            <!-- Page Content -->
+            <div class="prose-blog" set:html={finalContent} />
+        </div>
+    </div>
+</Layout>
