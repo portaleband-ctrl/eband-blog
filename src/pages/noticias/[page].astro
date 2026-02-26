@@ -4,10 +4,12 @@ import ArticleCard from "../../components/ArticleCard.astro";
 import { supabase } from "../../lib/supabaseClient";
 
 export async function getStaticPaths({ paginate }: { paginate: any }) {
+    const today = new Date().toISOString().split("T")[0];
     const { data: rawArticles } = await supabase
         .from("posts")
         .select("*")
         .eq("status", "published")
+        .lte("published_at", today)
         .order("published_at", { ascending: false });
 
     const articles =

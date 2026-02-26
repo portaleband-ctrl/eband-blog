@@ -4,10 +4,13 @@ import ArticleCard from "../components/ArticleCard.astro";
 import { supabase } from "../lib/supabaseClient";
 
 // Server-side Data Fetching - Roda apenas no servidor = SEO Perfeito
+const today = new Date().toISOString().split("T")[0];
+
 const { data: rawArticles } = await supabase
 	.from("posts")
 	.select("*")
 	.eq("status", "published")
+	.lte("published_at", today)
 	.order("published_at", { ascending: false })
 	.limit(48);
 

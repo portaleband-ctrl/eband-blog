@@ -20,10 +20,13 @@ const { slug: rawSlug } = Astro.params;
 const slug = rawSlug?.trim().toLowerCase();
 const { name, description } = Astro.props;
 
+const today = new Date().toISOString().split("T")[0];
+
 const { data: rawArticles } = await supabase
     .from("posts")
     .select("*")
     .eq("status", "published")
+    .lte("published_at", today)
     .ilike("category", name) // Apenas artigos onde category = name
     .order("published_at", { ascending: false })
     .limit(48);

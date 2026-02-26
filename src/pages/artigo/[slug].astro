@@ -4,16 +4,18 @@ import { supabase } from "../../lib/supabaseClient";
 import { Calendar, Tag } from "lucide-react";
 
 export async function getStaticPaths() {
+    const today = new Date().toISOString().split("T")[0];
     const { data: articles } = await supabase
         .from("posts")
         .select("slug")
-        .eq("status", "published");
+        .eq("status", "published")
+        .lte("published_at", today);
 
-    if (!articles) return [];
-
-    return articles.map((article) => ({
-        params: { slug: article.slug.trim().toLowerCase() },
-    }));
+    return (
+        articles?.map((article) => ({
+            params: { slug: article.slug.trim().toLowerCase() },
+        })) || []
+    );
 }
 
 const { slug: rawSlug } = Astro.params;
