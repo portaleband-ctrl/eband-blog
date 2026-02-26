@@ -12,11 +12,12 @@ export async function getStaticPaths() {
     if (!articles) return [];
 
     return articles.map((article) => ({
-        params: { slug: article.slug },
+        params: { slug: article.slug.trim().toLowerCase() },
     }));
 }
 
-const { slug } = Astro.params;
+const { slug: rawSlug } = Astro.params;
+const slug = rawSlug?.trim().toLowerCase();
 
 const { data: rawArticle } = await supabase
     .from("posts")

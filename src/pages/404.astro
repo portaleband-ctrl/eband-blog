@@ -1,0 +1,27 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Página não encontrada | Blog.">
+    <div class="blog-container py-32 text-center">
+        <h1 class="text-6xl font-black text-[#2D3277] mb-6">404</h1>
+        <p class="text-xl text-gray-500 mb-10">
+            Ops! A página que você procura não foi encontrada.
+        </p>
+        <a
+            href="/"
+            class="inline-flex items-center px-8 py-3 bg-[#3483FA] text-white font-bold rounded-full hover:bg-blue-600 transition-all shadow-md"
+        >
+            Voltar para o Início
+        </a>
+
+        <div
+            class="mt-16 p-8 bg-gray-50 rounded-2xl border border-gray-100 max-w-2xl mx-auto"
+        >
+            <p class="text-sm text-gray-400">
+                Se você clicou em um artigo novo, pode ser que o site ainda
+                esteja sendo atualizado. Tente novamente em 1 minuto.
+            </p>
+        </div>
+    </div>
+</Layout>

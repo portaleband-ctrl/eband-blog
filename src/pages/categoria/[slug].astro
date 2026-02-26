@@ -11,12 +11,13 @@ export async function getStaticPaths() {
     if (!categories) return [];
 
     return categories.map((cat) => ({
-        params: { slug: cat.slug },
+        params: { slug: cat.slug.trim().toLowerCase() },
         props: { name: cat.name, description: cat.description },
     }));
 }
 
-const { slug } = Astro.params;
+const { slug: rawSlug } = Astro.params;
+const slug = rawSlug?.trim().toLowerCase();
 const { name, description } = Astro.props;
 
 const { data: rawArticles } = await supabase

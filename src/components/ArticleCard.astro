@@ -35,14 +35,15 @@ const dateFormatted = new Date(article.publishedAt).toLocaleDateString(
     "pt-BR",
     {
         day: "numeric",
-        month: "short",
-        year: "numeric",
     },
 );
+
+// Normalizar o slug para evitar erros de roteamento
+const slug = article.slug?.trim().toLowerCase() || article.id;
 ---
 
 <a
-    href={`/artigo/${article.slug}`}
+    href={`/artigo/${slug}/`}
     class={`group block h-full bg-white rounded-xl overflow-hidden border border-gray-100 hover:border-[#3483FA]/30 transition-all duration-300 ${featured ? "md:flex md:flex-row-reverse shadow-lg" : "shadow-sm hover:shadow-md"}`}
 >
     <div
