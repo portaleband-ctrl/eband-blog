@@ -19,13 +19,22 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 const { name, description } = Astro.props;
 
-const { data: articles } = await supabase
-    .from("articles")
+const { data: rawArticles } = await supabase
+    .from("posts")
     .select("*")
     .eq("status", "published")
     .ilike("category", name) // Apenas artigos onde category = name
-    .order("publishedAt", { ascending: false })
+    .order("published_at", { ascending: false })
     .limit(48);
+
+const articles =
+    rawArticles?.map((post) => ({
+        ...post,
+        featuredImage: post.image_url,
+        featuredImageAlt: post.image_alt,
+        publishedAt: post.published_at,
+        author: post.author_name,
+    })) || [];
 ---
 
 <Layout
