@@ -14,6 +14,16 @@ export default defineConfig({
   adapter: cloudflare(),
   integrations: [mdx(), sitemap(), react()],
 
+  image: {
+    remotePatterns: [
+      { protocol: 'https', hostname: 'images.unsplash.com' },
+      { protocol: 'https', hostname: 'm.media-amazon.com' },
+      { protocol: 'https', hostname: '**.supabase.co' },
+      { protocol: 'https', hostname: '**.easypanel.host' },
+      { protocol: 'https', hostname: '**.mftikx.easypanel.host' },
+    ],
+  },
+
   vite: {
     plugins: [tailwindcss()],
   },

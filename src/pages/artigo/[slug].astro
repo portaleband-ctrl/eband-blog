@@ -2,6 +2,7 @@
 import Layout from "../../layouts/Layout.astro";
 import { supabase } from "../../lib/supabaseClient";
 import { Calendar, Tag } from "lucide-react";
+import { Image } from "astro:assets";
 
 export const prerender = false;
 
@@ -9,8 +10,6 @@ const { slug: rawSlug } = Astro.params;
 const slug = rawSlug?.trim().toLowerCase();
 
 // Cache na Borda (Cloudflare):
-// s-maxage=31536000 (1 ano no cache da Cloudflare)
-// stale-while-revalidate=60 (revalida em background após 60s se o cache estiver velho)
 Astro.response.headers.set(
     "Cache-Control",
     "public, s-maxage=31536000, stale-while-revalidate=60",
@@ -34,11 +33,7 @@ const article = {
     author: rawArticle.author_name,
 };
 
-// Transform the HTML to ensure links have proper SEO tags
-// This is normally done automatically, but we ensure it here
 let finalContent = article.content;
-
-// Remove any inline scripts or dangerous tags just in case
 finalContent = finalContent.replace(
     /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
     "",
@@ -119,9 +114,11 @@ const dateFormatted = new Date(article.publishedAt).toLocaleDateString(
             <div
                 class="relative rounded-2xl overflow-hidden shadow-lg mb-12 aspect-[16/9] bg-gray-100"
             >
-                <img
+                <Image
                     src={article.featuredImage}
                     alt={article.title}
+                    width={1100}
+                    height={619}
                     class="w-full h-full object-cover"
                     loading="eager"
                     fetchpriority="high"

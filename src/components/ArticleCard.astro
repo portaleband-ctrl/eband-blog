@@ -1,6 +1,5 @@
 ---
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { Image } from "astro:assets";
 
 interface Props {
     article: {
@@ -53,9 +52,11 @@ const slug = article.slug?.trim().toLowerCase() || article.id;
             class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent z-10"
         >
         </div>
-        <img
+        <Image
             src={article.featuredImage}
             alt={article.title}
+            width={featured ? 800 : 400}
+            height={featured ? 450 : 250}
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
             loading={featured ? "eager" : "lazy"}
             fetchpriority={featured ? "high" : "auto"}
