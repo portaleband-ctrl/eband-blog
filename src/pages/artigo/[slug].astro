@@ -3,35 +3,18 @@ import Layout from "../../layouts/Layout.astro";
 import { supabase } from "../../lib/supabaseClient";
 import { Calendar, Tag } from "lucide-react";
 
-export async function getStaticPaths() {
-    const now = new Date().toISOString();
-    let allArticles: any[] = [];
-    let from = 0;
-    const step = 1000;
-
-    while (true) {
-        const { data: articles, error } = await supabase
-            .from("posts")
-            .select("slug")
-            .eq("status", "published")
-            .lte("published_at", now)
-            .range(from, from + step - 1);
-
-        if (error || !articles || articles.length === 0) break;
-        allArticles = [...allArticles, ...articles];
-        if (articles.length < step) break;
-        from += step;
-    }
-
-    return (
-        allArticles?.map((article) => ({
-            params: { slug: article.slug.trim().toLowerCase() },
-        })) || []
-    );
-}
+export const prerender = false;
 
 const { slug: rawSlug } = Astro.params;
 const slug = rawSlug?.trim().toLowerCase();
+
+// Cache na Borda (Cloudflare):
+// s-maxage=31536000 (1 ano no cache da Cloudflare)
+// stale-while-revalidate=60 (revalida em background após 60s se o cache estiver velho)
+Astro.response.headers.set(
+    "Cache-Control",
+    "public, s-maxage=31536000, stale-while-revalidate=60",
+);
 
 const { data: rawArticle } = await supabase
     .from("posts")

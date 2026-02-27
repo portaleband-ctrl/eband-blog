@@ -2,17 +2,15 @@
 import Layout from "../../layouts/Layout.astro";
 import { supabase } from "../../lib/supabaseClient";
 
-export async function getStaticPaths() {
-    const { data: pages } = await supabase.from("pages").select("slug");
-
-    if (!pages) return [];
-
-    return pages.map((page) => ({
-        params: { slug: page.slug },
-    }));
-}
+export const prerender = false;
 
 const { slug } = Astro.params;
+
+// Cache na Borda (Cloudflare)
+Astro.response.headers.set(
+    "Cache-Control",
+    "public, s-maxage=31536000, stale-while-revalidate=60",
+);
 
 const { data: page } = await supabase
     .from("pages")
