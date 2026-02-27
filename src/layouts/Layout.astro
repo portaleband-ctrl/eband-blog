@@ -3,7 +3,7 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import "../styles/global.css";
 import { supabase } from "../lib/supabaseClient";
-import { getImage } from "astro:assets";
+import { optimizeRemoteImage } from "../lib/imageUtils";
 
 interface Props {
   title?: string;
@@ -39,17 +39,11 @@ const currentUrl = new URL(
   Astro.site || "https://eband.com.br",
 );
 
-// Otimizar Imagem LCP para o Preload (Sincronizado com o componente Image)
-let optimizedImage = null;
+// Otimizar Imagem LCP para o Preload
+// Sincronizado com o ArticleCard e [slug].astro
+let preloadUrl = image;
 if (image && image !== "/default-og.png") {
-  // Simular a otimização que o componente Image faria para o destaque
-  optimizedImage = await getImage({
-    src: image,
-    width: 1100,
-    height: 619,
-    format: "webp",
-    quality: 80,
-  });
+  preloadUrl = optimizeRemoteImage(image, 1100, 80);
 }
 ---
 
@@ -61,31 +55,22 @@ if (image && image !== "/default-og.png") {
     <link rel="icon" type="image/x-icon" href={favicon} />
     <meta name="generator" content={Astro.generator} />
 
-    <!-- Preconnects Prioritários -->
+    <!-- Google Fonts Preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://images.unsplash.com" />
 
-    <!-- Preload LCP Image (Otimizada) -->
+    <!-- LCP Preload (Manual Optimization) -->
     {
-      optimizedImage && (
-        <link
-          rel="preload"
-          as="image"
-          href={optimizedImage.src}
-          fetchpriority="high"
-        />
+      preloadUrl && preloadUrl !== "/default-og.png" && (
+        <link rel="preload" as="image" href={preloadUrl} fetchpriority="high" />
       )
     }
 
-    <!-- Fonts - Carregamento Não-Bloqueante -->
+    <!-- Fonts: Carregamento Assíncrono para evitar bloqueio de renderização -->
     <link
-      rel="preload"
-      as="style"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Outfit:wght@700;900&display=swap"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Outfit:wght@700;900&display=swap"
       rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Outfit:wght@700;900&display=swap"
       media="print"
       onload="this.media='all'"
     />
@@ -96,24 +81,58 @@ if (image && image !== "/default-og.png") {
       />
     </noscript>
 
-    <!-- Primary Meta Tags -->
+    <!-- Meta Tags -->
     <title>{title}</title>
     <meta name="title" content={title} />
     <meta name="description" content={description} />
-
-    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={currentUrl} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={image} />
-
-    <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={currentUrl} />
     <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={image} />
+
+    <!-- CSS Crítico Inline: Resolve o "Render Blocking CSS" do PageSpeed -->
+    <style is:inline>
+      :root {
+        --blue: #3483fa;
+      }
+      body {
+        background-color: #f5f5f5;
+        margin: 0;
+        font-family: sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      .blog-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 16px;
+      }
+      header {
+        background-color: #ffe600;
+        border-bottom: 1px solid #fcd200;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+      }
+      .h-22 {
+        height: 88px;
+      }
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+      .aspect-\[16\/9\] {
+        aspect-ratio: 16/9;
+      }
+      .aspect-\[16\/10\] {
+        aspect-ratio: 16/10;
+      }
+    </style>
   </head>
   <body class="bg-[#F5F5F5] min-h-screen flex flex-col antialiased">
     <Header settings={settings} />

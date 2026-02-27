@@ -1,5 +1,6 @@
 ---
 import { Image } from "astro:assets";
+import { optimizeRemoteImage } from "../lib/imageUtils";
 
 interface Props {
     article: {
@@ -39,6 +40,13 @@ const dateFormatted = new Date(article.publishedAt).toLocaleDateString(
 
 // Normalizar o slug para evitar erros de roteamento
 const slug = article.slug?.trim().toLowerCase() || article.id;
+
+// Otimização Manual da URL antes de passar para o componente Image
+const optimizedImageUrl = optimizeRemoteImage(
+    article.featuredImage,
+    featured ? 1100 : 400,
+    80,
+);
 ---
 
 <a
@@ -53,7 +61,7 @@ const slug = article.slug?.trim().toLowerCase() || article.id;
         >
         </div>
         <Image
-            src={article.featuredImage}
+            src={optimizedImageUrl}
             alt={article.title}
             width={featured ? 1100 : 400}
             height={featured ? 619 : 250}

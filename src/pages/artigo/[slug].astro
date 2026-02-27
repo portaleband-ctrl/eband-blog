@@ -3,6 +3,7 @@ import Layout from "../../layouts/Layout.astro";
 import { supabase } from "../../lib/supabaseClient";
 import { Calendar, Tag } from "lucide-react";
 import { Image } from "astro:assets";
+import { optimizeRemoteImage } from "../../lib/imageUtils";
 
 export const prerender = false;
 
@@ -47,12 +48,15 @@ const dateFormatted = new Date(article.publishedAt).toLocaleDateString(
         year: "numeric",
     },
 );
+
+// Otimização Manual da URL antes de passar para o componente Image
+const optimizedImageUrl = optimizeRemoteImage(article.featuredImage, 1100, 80);
 ---
 
 <Layout
     title={`${article.title} | Blog.`}
     description={article.excerpt}
-    image={article.featuredImage}
+    image={optimizedImageUrl}
 >
     <article class="ai-article-container pb-24">
         <!-- Header Hero Section -->
@@ -115,7 +119,7 @@ const dateFormatted = new Date(article.publishedAt).toLocaleDateString(
                 class="relative rounded-2xl overflow-hidden shadow-lg mb-12 aspect-[16/9] bg-gray-100"
             >
                 <Image
-                    src={article.featuredImage}
+                    src={optimizedImageUrl}
                     alt={article.title}
                     width={1100}
                     height={619}
