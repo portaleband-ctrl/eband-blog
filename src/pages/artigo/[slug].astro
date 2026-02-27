@@ -4,7 +4,7 @@ import { supabase } from "../../lib/supabaseClient";
 import { Calendar, Tag } from "lucide-react";
 
 export async function getStaticPaths() {
-    const today = new Date().toISOString().split("T")[0];
+    const now = new Date().toISOString();
     let allArticles: any[] = [];
     let from = 0;
     const step = 1000;
@@ -14,7 +14,7 @@ export async function getStaticPaths() {
             .from("posts")
             .select("slug")
             .eq("status", "published")
-            .lte("published_at", today)
+            .lte("published_at", now)
             .range(from, from + step - 1);
 
         if (error || !articles || articles.length === 0) break;

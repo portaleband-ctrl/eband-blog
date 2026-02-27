@@ -4,7 +4,7 @@ import ArticleCard from "../../components/ArticleCard.astro";
 import { supabase } from "../../lib/supabaseClient";
 
 export async function getStaticPaths({ paginate }: { paginate: any }) {
-    const today = new Date().toISOString().split("T")[0];
+    const now = new Date().toISOString();
     let allArticles: any[] = [];
     let from = 0;
     const step = 1000;
@@ -14,7 +14,7 @@ export async function getStaticPaths({ paginate }: { paginate: any }) {
             .from("posts")
             .select("*")
             .eq("status", "published")
-            .lte("published_at", today)
+            .lte("published_at", now)
             .order("published_at", { ascending: false })
             .range(from, from + step - 1);
 
