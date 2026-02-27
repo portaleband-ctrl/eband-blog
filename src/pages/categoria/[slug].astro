@@ -27,13 +27,10 @@ if (!categoryData) {
 
 const { name, description } = categoryData;
 
-const now = new Date().toISOString();
-
 const { data: rawArticles } = await supabase
     .from("posts")
     .select("*")
     .eq("status", "published")
-    .lte("published_at", now)
     .ilike("category", name) // Apenas artigos onde category = name
     .order("published_at", { ascending: false })
     .limit(48);

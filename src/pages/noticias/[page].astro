@@ -15,14 +15,11 @@ Astro.response.headers.set(
     "public, s-maxage=3600, stale-while-revalidate=60",
 ); // 1h de cache para lista
 
-const now = new Date().toISOString();
-
 // Count total for pagination
 const { count } = await supabase
     .from("posts")
     .select("*", { count: "exact", head: true })
-    .eq("status", "published")
-    .lte("published_at", now);
+    .eq("status", "published");
 
 const totalItems = count || 0;
 const lastPage = Math.ceil(totalItems / pageSize);
@@ -35,7 +32,6 @@ const { data: rawArticles } = await supabase
     .from("posts")
     .select("*")
     .eq("status", "published")
-    .lte("published_at", now)
     .order("published_at", { ascending: false })
     .range(from, to);
 
