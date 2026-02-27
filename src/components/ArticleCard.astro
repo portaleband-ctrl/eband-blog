@@ -41,12 +41,9 @@ const dateFormatted = new Date(article.publishedAt).toLocaleDateString(
 // Normalizar o slug para evitar erros de roteamento
 const slug = article.slug?.trim().toLowerCase() || article.id;
 
-// Otimização Manual da URL antes de passar para o componente Image
-const optimizedImageUrl = optimizeRemoteImage(
-    article.featuredImage,
-    featured ? 1100 : 400,
-    80,
-);
+// Otimização Manual: Usamos a URL original para o Image lidar via proxy,
+// mas o widths vai garantir que o proxy gere versões certas.
+const imageUrl = article.featuredImage;
 ---
 
 <a
@@ -61,14 +58,14 @@ const optimizedImageUrl = optimizeRemoteImage(
         >
         </div>
         <Image
-            src={optimizedImageUrl}
+            src={imageUrl}
             alt={article.title}
             width={featured ? 1100 : 400}
             height={featured ? 619 : 250}
-            widths={featured ? [400, 800, 1100] : [400, 600]}
+            widths={featured ? [400, 720, 1100] : [400, 600]}
             sizes={featured
-                ? "(max-width: 768px) 100vw, 1100px"
-                : "(max-width: 768px) 100vw, 400px"}
+                ? "(max-width: 480px) 400px, (max-width: 768px) 720px, 1100px"
+                : "(max-width: 480px) 100vw, 400px"}
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
             loading={featured ? "eager" : "lazy"}
             fetchpriority={featured ? "high" : "auto"}
@@ -76,7 +73,7 @@ const optimizedImageUrl = optimizeRemoteImage(
         />
         <div class="absolute top-4 left-4 z-20">
             <span
-                class="inline-block bg-[#FFE600] text-[#2D3277] text-[10px] font-black px-2.5 py-1 rounded-sm uppercase tracking-widest shadow-sm"
+                class="inline-block bg-[#3483FA] text-white text-[10px] font-black px-2.5 py-1 rounded-sm uppercase tracking-widest shadow-sm"
             >
                 {article.category}
             </span>

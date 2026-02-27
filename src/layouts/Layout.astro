@@ -3,7 +3,7 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import "../styles/global.css";
 import { supabase } from "../lib/supabaseClient";
-import { optimizeRemoteImage } from "../lib/imageUtils";
+import { getImage } from "astro:assets";
 
 interface Props {
   title?: string;
@@ -39,11 +39,22 @@ const currentUrl = new URL(
   Astro.site || "https://eband.com.br",
 );
 
-// Otimizar Imagem LCP para o Preload
-// Sincronizado com o ArticleCard e [slug].astro
+// Sincronizar o Preload com o Proxy de Imagem do Astro
+// Isso resolve o erro "fetchpriority=high precisa ser aplicada" do PageSpeed
 let preloadUrl = image;
 if (image && image !== "/default-og.png") {
-  preloadUrl = optimizeRemoteImage(image, 1100, 80);
+  try {
+    const optimized = await getImage({
+      src: image,
+      width: 1100,
+      height: 619,
+      format: "webp",
+      quality: 80,
+    });
+    preloadUrl = optimized.src;
+  } catch (e) {
+    console.error("Erro ao gerar preload URL:", e);
+  }
 }
 ---
 
@@ -58,28 +69,21 @@ if (image && image !== "/default-og.png") {
     <!-- Google Fonts Preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://images.unsplash.com" />
 
-    <!-- LCP Preload (Manual Optimization) -->
+    <!-- LCP Preload: Sincronizado com o Proxy do Astro -->
     {
       preloadUrl && preloadUrl !== "/default-og.png" && (
         <link rel="preload" as="image" href={preloadUrl} fetchpriority="high" />
       )
     }
 
-    <!-- Fonts: Carregamento Assíncrono para evitar bloqueio de renderização -->
+    <!-- Carregamento Assíncrono de CSS não-crítico e Fontes -->
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Outfit:wght@700;900&display=swap"
       media="print"
       onload="this.media='all'"
     />
-    <noscript>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Outfit:wght@700;900&display=swap"
-        rel="stylesheet"
-      />
-    </noscript>
 
     <!-- Meta Tags -->
     <title>{title}</title>
@@ -96,41 +100,62 @@ if (image && image !== "/default-og.png") {
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={image} />
 
-    <!-- CSS Crítico Inline: Resolve o "Render Blocking CSS" do PageSpeed -->
+    <!-- CSS Crítico Inline (Manual): Remove o bloqueio de renderização do PageSpeed -->
     <style is:inline>
       :root {
         --blue: #3483fa;
+        --dark-blue: #2d3277;
       }
       body {
         background-color: #f5f5f5;
         margin: 0;
-        font-family: sans-serif;
+        font-family: "Inter", system-ui, sans-serif;
         -webkit-font-smoothing: antialiased;
+        color: #111827;
       }
       .blog-container {
         max-width: 1200px;
         margin: 0 auto;
         padding: 0 16px;
+        width: 100%;
+        box-sizing: border-box;
       }
       header {
-        background-color: #ffe600;
-        border-bottom: 1px solid #fcd200;
+        background-color: #ffffff;
+        border-bottom: 1px solid #f3f4f6;
         position: sticky;
         top: 0;
         z-index: 50;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
       }
-      .h-22 {
-        height: 88px;
+      .h-16 {
+        height: 64px;
+      }
+      .h-20 {
+        height: 80px;
+      }
+      @media (min-width: 768px) {
+        .h-20 {
+          height: 80px;
+        }
+      }
+      main {
+        display: block;
+        flex-grow: 1;
+      }
+      .flex {
+        display: flex;
+      }
+      .flex-col {
+        flex-direction: column;
+      }
+      .min-h-screen {
+        min-height: 100vh;
       }
       img {
         max-width: 100%;
         height: auto;
-      }
-      .aspect-\[16\/9\] {
-        aspect-ratio: 16/9;
-      }
-      .aspect-\[16\/10\] {
-        aspect-ratio: 16/10;
+        display: block;
       }
     </style>
   </head>
