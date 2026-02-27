@@ -9,7 +9,8 @@ export async function getStaticPaths() {
         .from("posts")
         .select("slug")
         .eq("status", "published")
-        .lte("published_at", today);
+        .lte("published_at", today)
+        .limit(5000);
 
     return (
         articles?.map((article) => ({

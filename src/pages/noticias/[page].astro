@@ -10,7 +10,8 @@ export async function getStaticPaths({ paginate }: { paginate: any }) {
         .select("*")
         .eq("status", "published")
         .lte("published_at", today)
-        .order("published_at", { ascending: false });
+        .order("published_at", { ascending: false })
+        .limit(5000);
 
     const articles =
         rawArticles?.map((post) => ({
