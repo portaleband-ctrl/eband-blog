@@ -123,6 +123,9 @@ const dateFormatted = new Date(article.publishedAt).toLocaleDateString(
                     src={article.featuredImage}
                     alt={article.title}
                     class="w-full h-full object-cover"
+                    loading="eager"
+                    fetchpriority="high"
+                    decoding="async"
                 />
                 <div
                     class="absolute inset-0 ring-1 ring-inset ring-black/10 rounded-2xl"

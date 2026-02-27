@@ -58,6 +58,8 @@ const slug = article.slug?.trim().toLowerCase() || article.id;
             alt={article.title}
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
             loading={featured ? "eager" : "lazy"}
+            fetchpriority={featured ? "high" : "auto"}
+            decoding="async"
         />
         <div class="absolute top-4 left-4 z-20">
             <span
