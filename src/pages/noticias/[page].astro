@@ -3,44 +3,58 @@ import Layout from "../../layouts/Layout.astro";
 import ArticleCard from "../../components/ArticleCard.astro";
 import { supabase } from "../../lib/supabaseClient";
 
-export async function getStaticPaths({ paginate }: { paginate: any }) {
-    const now = new Date().toISOString();
-    let allArticles: any[] = [];
-    let from = 0;
-    const step = 1000;
+export const prerender = false;
 
-    while (true) {
-        const { data: articles, error } = await supabase
-            .from("posts")
-            .select("*")
-            .eq("status", "published")
-            .lte("published_at", now)
-            .order("published_at", { ascending: false })
-            .range(from, from + step - 1);
+const { page: pageParam } = Astro.params;
+const currentPage = parseInt(pageParam || "1");
+const pageSize = 12;
 
-        if (error || !articles || articles.length === 0) break;
-        allArticles = [...allArticles, ...articles];
-        if (articles.length < step) break;
-        from += step;
-    }
+// Cache na Borda (Cloudflare)
+Astro.response.headers.set(
+    "Cache-Control",
+    "public, s-maxage=3600, stale-while-revalidate=60",
+); // 1h de cache para lista
 
-    const articles =
-        allArticles?.map((post) => ({
+const now = new Date().toISOString();
+
+// Count total for pagination
+const { count } = await supabase
+    .from("posts")
+    .select("*", { count: "exact", head: true })
+    .eq("status", "published")
+    .lte("published_at", now);
+
+const totalItems = count || 0;
+const lastPage = Math.ceil(totalItems / pageSize);
+
+// Fetch articles for current page
+const from = (currentPage - 1) * pageSize;
+const to = from + pageSize - 1;
+
+const { data: rawArticles } = await supabase
+    .from("posts")
+    .select("*")
+    .eq("status", "published")
+    .lte("published_at", now)
+    .order("published_at", { ascending: false })
+    .range(from, to);
+
+const page = {
+    data:
+        rawArticles?.map((post) => ({
             ...post,
             featuredImage: post.image_url,
             featuredImageAlt: post.image_alt,
             publishedAt: post.published_at,
             author: post.author_name,
-        })) || [];
-
-    return paginate(articles, { pageSize: 12 });
-}
-
-interface Props {
-    page: any;
-}
-
-const { page } = Astro.props;
+        })) || [],
+    currentPage,
+    lastPage,
+    url: {
+        prev: currentPage > 1 ? `/noticias/${currentPage - 1}` : null,
+        next: currentPage < lastPage ? `/noticias/${currentPage + 1}` : null,
+    },
+};
 ---
 
 <Layout title={`Notícias - Página ${page.currentPage} | Blog.`}>

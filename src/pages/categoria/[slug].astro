@@ -3,22 +3,29 @@ import Layout from "../../layouts/Layout.astro";
 import ArticleCard from "../../components/ArticleCard.astro";
 import { supabase } from "../../lib/supabaseClient";
 
-export async function getStaticPaths() {
-    const { data: categories } = await supabase
-        .from("categories")
-        .select("slug, name, description");
-
-    if (!categories) return [];
-
-    return categories.map((cat) => ({
-        params: { slug: cat.slug.trim().toLowerCase() },
-        props: { name: cat.name, description: cat.description },
-    }));
-}
+export const prerender = false;
 
 const { slug: rawSlug } = Astro.params;
 const slug = rawSlug?.trim().toLowerCase();
-const { name, description } = Astro.props;
+
+// Cache na Borda (Cloudflare)
+Astro.response.headers.set(
+    "Cache-Control",
+    "public, s-maxage=31536000, stale-while-revalidate=60",
+);
+
+// Fetch category data
+const { data: categoryData } = await supabase
+    .from("categories")
+    .select("name, description")
+    .eq("slug", slug)
+    .single();
+
+if (!categoryData) {
+    return Astro.redirect("/404");
+}
+
+const { name, description } = categoryData;
 
 const now = new Date().toISOString();
 
