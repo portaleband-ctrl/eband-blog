@@ -3,6 +3,7 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import "../styles/global.css";
 import { supabase } from "../lib/supabaseClient";
+import { getImage } from "astro:assets";
 
 interface Props {
   title?: string;
@@ -38,9 +39,18 @@ const currentUrl = new URL(
   Astro.site || "https://eband.com.br",
 );
 
-// Extrair subdomínio do Supabase para preconnect
-const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
-const supabaseDomain = supabaseUrl ? new URL(supabaseUrl).origin : null;
+// Otimizar Imagem LCP para o Preload (Sincronizado com o componente Image)
+let optimizedImage = null;
+if (image && image !== "/default-og.png") {
+  // Simular a otimização que o componente Image faria para o destaque
+  optimizedImage = await getImage({
+    src: image,
+    width: 1100,
+    height: 619,
+    format: "webp",
+    quality: 80,
+  });
+}
 ---
 
 <!doctype html>
@@ -51,27 +61,40 @@ const supabaseDomain = supabaseUrl ? new URL(supabaseUrl).origin : null;
     <link rel="icon" type="image/x-icon" href={favicon} />
     <meta name="generator" content={Astro.generator} />
 
-    <!-- Preconnects -->
-    {
-      supabaseDomain && (
-        <link rel="preconnect" href={supabaseDomain} crossorigin />
-      )
-    }
+    <!-- Preconnects Prioritários -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    <!-- Fonts - Enxutas -->
+    <!-- Preload LCP Image (Otimizada) -->
+    {
+      optimizedImage && (
+        <link
+          rel="preload"
+          as="image"
+          href={optimizedImage.src}
+          fetchpriority="high"
+        />
+      )
+    }
+
+    <!-- Fonts - Carregamento Não-Bloqueante -->
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Outfit:wght@700;900&display=swap"
+    />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Outfit:wght@700;900&display=swap"
       rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
     />
-
-    <!-- Preload LCP Image -->
-    {
-      image && image !== "/default-og.png" && (
-        <link rel="preload" as="image" href={image} fetchpriority="high" />
-      )
-    }
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Outfit:wght@700;900&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
 
     <!-- Primary Meta Tags -->
     <title>{title}</title>

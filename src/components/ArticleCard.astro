@@ -55,8 +55,12 @@ const slug = article.slug?.trim().toLowerCase() || article.id;
         <Image
             src={article.featuredImage}
             alt={article.title}
-            width={featured ? 800 : 400}
-            height={featured ? 450 : 250}
+            width={featured ? 1100 : 400}
+            height={featured ? 619 : 250}
+            widths={featured ? [400, 800, 1100] : [400, 600]}
+            sizes={featured
+                ? "(max-width: 768px) 100vw, 1100px"
+                : "(max-width: 768px) 100vw, 400px"}
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
             loading={featured ? "eager" : "lazy"}
             fetchpriority={featured ? "high" : "auto"}
