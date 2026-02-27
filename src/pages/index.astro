@@ -11,13 +11,19 @@ Astro.response.headers.set(
 	"public, s-maxage=60, stale-while-revalidate=30",
 );
 
-// Server-side Data Fetching - Roda apenas no servidor = SEO Perfeito
-const { data: rawArticles } = await supabase
-	.from("posts")
-	.select("*")
-	.eq("status", "published")
-	.order("published_at", { ascending: false })
-	.limit(48);
+// Server-side Data Fetching - Paralelizado com Promise.all para baixar o TTFB
+const [articlesResponse, categoriesResponse] = await Promise.all([
+	supabase
+		.from("posts")
+		.select("*")
+		.eq("status", "published")
+		.order("published_at", { ascending: false })
+		.limit(48),
+	supabase.from("categories").select("*").order("name"),
+]);
+
+const rawArticles = articlesResponse.data;
+const categories = categoriesResponse.data;
 
 const articles =
 	rawArticles?.map((post) => ({
@@ -27,11 +33,6 @@ const articles =
 		publishedAt: post.published_at,
 		author: post.author_name,
 	})) || [];
-
-const { data: categories } = await supabase
-	.from("categories")
-	.select("*")
-	.order("name");
 
 const featuredCategories = categories?.filter((c) => c.featured) || [];
 const displayCategories =

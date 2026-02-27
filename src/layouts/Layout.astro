@@ -10,6 +10,7 @@ interface Props {
   image?: string;
 }
 
+// Única chamada para settings em todo o layout
 const { data: rawSettings } = await supabase
   .from("settings")
   .select("*")
@@ -36,6 +37,10 @@ const currentUrl = new URL(
   Astro.url.pathname,
   Astro.site || "https://eband.com.br",
 );
+
+// Extrair subdomínio do Supabase para preconnect
+const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+const supabaseDomain = supabaseUrl ? new URL(supabaseUrl).origin : null;
 ---
 
 <!doctype html>
@@ -46,9 +51,16 @@ const currentUrl = new URL(
     <link rel="icon" type="image/x-icon" href={favicon} />
     <meta name="generator" content={Astro.generator} />
 
-    <!-- Fonts -->
+    <!-- Preconnects -->
+    {
+      supabaseDomain && (
+        <link rel="preconnect" href={supabaseDomain} crossorigin />
+      )
+    }
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Fonts - Enxutas -->
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Outfit:wght@700;900&display=swap"
       rel="stylesheet"
@@ -80,11 +92,11 @@ const currentUrl = new URL(
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={image} />
   </head>
-  <body class="bg-[#F5F5F5] min-h-screen flex flex-col">
-    <Header />
+  <body class="bg-[#F5F5F5] min-h-screen flex flex-col antialiased">
+    <Header settings={settings} />
     <main class="flex-grow">
       <slot />
     </main>
-    <Footer />
+    <Footer settings={settings} />
   </body>
 </html>

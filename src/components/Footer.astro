@@ -1,11 +1,9 @@
 ---
-import { supabase } from "../lib/supabaseClient";
+interface Props {
+	settings?: any;
+}
 
-const { data: rawSettings } = await supabase
-	.from("settings")
-	.select("*")
-	.single();
-const settings = rawSettings?.config;
+const { settings } = Astro.props;
 
 const currentYear = new Date().getFullYear();
 const blogName = settings?.blogName || "Blog.";
