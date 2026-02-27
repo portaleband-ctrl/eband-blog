@@ -2,7 +2,11 @@
 import { Search } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 
-const { data: settings } = await supabase.from("settings").select("*").single();
+const { data: rawSettings } = await supabase
+	.from("settings")
+	.select("*")
+	.single();
+const settings = rawSettings?.config;
 
 const blogName = settings?.blogName || "Blog.";
 const blogLogo = settings?.blogLogo;

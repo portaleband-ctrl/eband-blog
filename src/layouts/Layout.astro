@@ -10,7 +10,11 @@ interface Props {
   image?: string;
 }
 
-const { data: settings } = await supabase.from("settings").select("*").single();
+const { data: rawSettings } = await supabase
+  .from("settings")
+  .select("*")
+  .single();
+const settings = rawSettings?.config;
 
 const {
   title: propTitle,
