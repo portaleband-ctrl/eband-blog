@@ -42,6 +42,16 @@ const dateFormatted = new Date(article.publishedAt).toLocaleDateString(
 const slug = article.slug?.trim().toLowerCase() || article.id;
 
 let imageUrl = article.featuredImage;
+
+// Redirecionamento essencial:
+// As imagens do WordPress estão no DB como eband.com.br, mas o site eband.com.br agora é o Astro.
+// As fotos físicas continuam no servidor WP do EasyPanel.
+if (imageUrl && imageUrl.includes("eband.com.br/wp-content")) {
+    imageUrl = imageUrl.replace(
+        "eband.com.br",
+        "site-eband-wordpress-eband.mftikx.easypanel.host",
+    );
+}
 ---
 
 <a

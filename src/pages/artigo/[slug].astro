@@ -25,9 +25,17 @@ if (!rawArticle) {
     return Astro.redirect("/404");
 }
 
+let featuredImage = rawArticle.image_url;
+if (featuredImage && featuredImage.includes("eband.com.br/wp-content")) {
+    featuredImage = featuredImage.replace(
+        "eband.com.br",
+        "site-eband-wordpress-eband.mftikx.easypanel.host",
+    );
+}
+
 const article = {
     ...rawArticle,
-    featuredImage: rawArticle.image_url,
+    featuredImage: featuredImage,
     featuredImageAlt: rawArticle.image_alt,
     publishedAt: rawArticle.published_at,
     author: rawArticle.author_name,
