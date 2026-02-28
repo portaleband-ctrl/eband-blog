@@ -15,7 +15,9 @@ Astro.response.headers.set(
 const [articlesResponse, categoriesResponse] = await Promise.all([
 	supabase
 		.from("posts")
-		.select("*")
+		.select(
+			"id, title, slug, excerpt, image_url, image_alt, published_at, author_name, category",
+		)
 		.eq("status", "published")
 		.order("published_at", { ascending: false })
 		.limit(48),
