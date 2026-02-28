@@ -52,6 +52,12 @@ if (imageUrl && imageUrl.includes("eband.com.br/wp-content")) {
         "site-eband-wordpress-eband.mftikx.easypanel.host",
     );
 }
+
+if (imageUrl && imageUrl.startsWith("http:")) {
+    imageUrl = imageUrl.replace("http:", "https:");
+} else if (imageUrl && imageUrl.startsWith("//")) {
+    imageUrl = "https:" + imageUrl;
+}
 ---
 
 <a

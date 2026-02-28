@@ -39,6 +39,20 @@ const currentUrl = new URL(
   Astro.site || "https://eband.com.br",
 );
 
+// Processo do AdSense
+let adSenseClient = "";
+if (settings?.googleAdSenseId) {
+  if (settings.googleAdSenseId.includes("pub-")) {
+    const pubId = settings.googleAdSenseId
+      .split("pub-")[1]
+      .split(",")[0]
+      .trim();
+    adSenseClient = `ca-pub-${pubId}`;
+  } else {
+    adSenseClient = settings.googleAdSenseId; // Caso o usuário já tenha colocado direto o `ca-pub-...`
+  }
+}
+
 // Sincronizar o Preload com o Proxy de Imagem do Astro
 let preloadUrl = image;
 if (image && image !== "/default-og.png") {
@@ -89,6 +103,17 @@ if (image && image !== "/default-og.png") {
         rel="stylesheet"
       />
     </noscript>
+
+    <!-- Google AdSense -->
+    {
+      adSenseClient && (
+        <script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adSenseClient}`}
+          crossorigin="anonymous"
+        />
+      )
+    }
 
     <!-- Meta Tags -->
     <title>{title}</title>

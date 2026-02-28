@@ -33,6 +33,12 @@ if (featuredImage && featuredImage.includes("eband.com.br/wp-content")) {
     );
 }
 
+if (featuredImage && featuredImage.startsWith("http:")) {
+    featuredImage = featuredImage.replace("http:", "https:");
+} else if (featuredImage && featuredImage.startsWith("//")) {
+    featuredImage = "https:" + featuredImage;
+}
+
 const article = {
     ...rawArticle,
     featuredImage: featuredImage,
