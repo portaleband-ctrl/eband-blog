@@ -51,15 +51,9 @@ let imageUrl = article.featuredImage;
     <div
         class={`relative overflow-hidden ${featured ? "md:w-[55%] lg:w-[60%]" : "aspect-[16/10]"}`}
     >
-        <Image
+        <img
             src={imageUrl}
             alt={article.title}
-            width={featured ? 1100 : 400}
-            height={featured ? 619 : 250}
-            widths={featured ? [400, 720, 1100] : [400, 600]}
-            sizes={featured
-                ? "(max-width: 480px) 400px, (max-width: 768px) 720px, 1100px"
-                : "(max-width: 480px) 100vw, 400px"}
             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
             loading={featured ? "eager" : "lazy"}
             fetchpriority={featured ? "high" : "auto"}
