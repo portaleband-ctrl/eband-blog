@@ -90,14 +90,27 @@ let preloadUrl = image;
       />
     </noscript>
 
-    <!-- Google AdSense -->
+    <!-- Google AdSense (Lazy Load para PageSpeed) -->
     {
       adSenseClient && (
-        <script
-          async
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adSenseClient}`}
-          crossorigin="anonymous"
-        />
+        <script is:inline define:vars={{ adSenseClient }}>
+          let adSenseLoaded = false;
+          const loadAdSense = () => {
+            if (adSenseLoaded) return;
+            adSenseLoaded = true;
+            const script = document.createElement('script');
+            script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adSenseClient}`;
+            script.async = true;
+            script.crossOrigin = 'anonymous';
+            document.head.appendChild(script);
+          };
+
+          // Carregar na primeira interação do usuário ou após 3.5s como fallback
+          window.addEventListener('scroll', loadAdSense, { once: true, passive: true });
+          window.addEventListener('mousemove', loadAdSense, { once: true, passive: true });
+          window.addEventListener('touchstart', loadAdSense, { once: true, passive: true });
+          setTimeout(loadAdSense, 3500);
+        </script>
       )
     }
 
