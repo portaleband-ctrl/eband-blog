@@ -74,6 +74,8 @@ if (imageUrl && imageUrl.startsWith("http:")) {
             loading={featured ? "eager" : "lazy"}
             fetchpriority={featured ? "high" : "auto"}
             decoding="async"
+            referrerpolicy="no-referrer"
+            crossorigin="anonymous"
         />
         <div class="absolute top-4 left-4 z-20">
             <span

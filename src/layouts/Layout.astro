@@ -53,22 +53,8 @@ if (settings?.googleAdSenseId) {
   }
 }
 
-// Sincronizar o Preload com o Proxy de Imagem do Astro
+// Usar a URL original da imagem para o og:image e LCP (sem bloqueio de otimização em tempo real)
 let preloadUrl = image;
-if (image && image !== "/default-og.png") {
-  try {
-    const optimized = await getImage({
-      src: image,
-      width: 1100,
-      height: 619,
-      format: "webp",
-      quality: 80,
-    });
-    preloadUrl = optimized.src;
-  } catch (e) {
-    console.error("Erro ao gerar preload URL:", e);
-  }
-}
 ---
 
 <!doctype html>
@@ -111,6 +97,16 @@ if (image && image !== "/default-og.png") {
           async
           src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adSenseClient}`}
           crossorigin="anonymous"
+        />
+      )
+    }
+
+    <!-- Google Search Console -->
+    {
+      settings?.googleSearchConsoleCode && (
+        <meta
+          name="google-site-verification"
+          content={settings.googleSearchConsoleCode}
         />
       )
     }
