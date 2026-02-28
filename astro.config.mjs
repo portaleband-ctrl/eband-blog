@@ -20,6 +20,7 @@ export default defineConfig({
       { protocol: 'https', hostname: 'm.media-amazon.com' },
       { protocol: 'https', hostname: '**.supabase.co' },
       { protocol: 'https', hostname: 'eband.com.br' },
+      { protocol: 'https', hostname: 'www.eband.com.br' },
       { protocol: 'https', hostname: '**.easypanel.host' },
       { protocol: 'https', hostname: '**.mftikx.easypanel.host' },
     ],
