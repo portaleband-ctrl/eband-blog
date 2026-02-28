@@ -40,7 +40,14 @@ const dateFormatted = new Date(article.publishedAt).toLocaleDateString(
 );
 
 const slug = article.slug?.trim().toLowerCase() || article.id;
-const imageUrl = article.featuredImage;
+
+// Forçar HTTPS para evitar erros de carregamento
+let imageUrl = article.featuredImage;
+if (imageUrl && imageUrl.startsWith("http:")) {
+    imageUrl = imageUrl.replace("http:", "https:");
+} else if (imageUrl && imageUrl.startsWith("//")) {
+    imageUrl = "https:" + imageUrl;
+}
 ---
 
 <a

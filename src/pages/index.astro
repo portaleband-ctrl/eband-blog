@@ -40,9 +40,9 @@ const displayCategories =
 		? featuredCategories
 		: categories?.slice(0, 8) || [];
 
-const mainArticles = articles || [];
-const featuredArticle = mainArticles.length > 0 ? mainArticles[0] : null;
-const recentArticles = mainArticles.slice(1);
+const displayArticles = articles || [];
+const featuredArticle = displayArticles.length > 0 ? displayArticles[0] : null;
+const recentArticles = displayArticles.slice(1, 13); // Pegar os próximos 12 artigos para a Home
 ---
 
 <Layout title="Home | Melhores Análises e Recomendações">
@@ -128,9 +128,9 @@ const recentArticles = mainArticles.slice(1);
 			<div class="mt-16 text-center">
 				<a
 					href="/noticias/2"
-					class="inline-flex items-center px-8 py-3 bg-white border border-gray-200 text-[#3483FA] font-bold rounded-full hover:bg-[#3483FA] hover:text-white transition-all shadow-sm group"
+					class="inline-flex items-center px-8 py-3 bg-[#FFE600] text-[#2D3277] font-bold rounded-full hover:bg-[#FCD200] transition-all shadow-sm group"
 				>
-					Ver todas as notícias
+					Ver mais notícias
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="20"

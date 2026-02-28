@@ -57,20 +57,20 @@ const dateFormatted = new Date(article.publishedAt).toLocaleDateString(
     <article class="ai-article-container pb-24">
         <!-- Header Hero Section -->
         <header
-            class="bg-white border-b border-gray-100 pt-10 pb-12 mb-12 relative overflow-hidden"
+            class="bg-[#FFE600] border-b border-[#FCD200] pt-10 pb-12 relative overflow-hidden"
         >
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <!-- Breadcrumb / Category -->
                 <div class="flex items-center gap-2 text-sm mb-6">
                     <a
                         href="/"
-                        class="text-gray-400 hover:text-[#3483FA] transition-colors"
+                        class="text-gray-700 hover:text-[#2D3277] transition-colors"
                         >Início</a
                     >
-                    <span class="text-gray-300">/</span>
+                    <span class="text-gray-400">/</span>
                     <a
                         href={`/categoria/${article.category?.toLowerCase()}`}
-                        class="text-[#3483FA] font-medium hover:underline capitalize"
+                        class="text-[#2D3277] font-bold hover:underline capitalize"
                         >{article.category}</a
                     >
                 </div>
