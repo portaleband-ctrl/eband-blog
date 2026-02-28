@@ -1,6 +1,7 @@
 ---
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import "../styles/global.css";
 import { supabase } from "../lib/supabaseClient";
 import { getImage } from "astro:assets";
 
@@ -39,6 +40,7 @@ const currentUrl = new URL(
 );
 
 // Sincronizar o Preload com o Proxy de Imagem do Astro
+// Isso resolve o erro "fetchpriority=high precisa ser aplicada" do PageSpeed
 let preloadUrl = image;
 if (image && image !== "/default-og.png") {
   try {
@@ -68,14 +70,14 @@ if (image && image !== "/default-og.png") {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    <!-- LCP Preload -->
+    <!-- LCP Preload: Sincronizado com o Proxy do Astro -->
     {
       preloadUrl && preloadUrl !== "/default-og.png" && (
         <link rel="preload" as="image" href={preloadUrl} fetchpriority="high" />
       )
     }
 
-    <!-- Carregamento Assíncrono de Fontes -->
+    <!-- Carregamento Assíncrono de CSS não-crítico e Fontes -->
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Outfit:wght@700;900&display=swap"
@@ -98,7 +100,7 @@ if (image && image !== "/default-og.png") {
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={image} />
 
-    <!-- CSS ULTRA-CRÍTICO INLINE (Substitui o global.css) -->
+    <!-- CSS Crítico Inline (Manual): Remove o bloqueio de renderização do PageSpeed -->
     <style is:inline>
       :root {
         --blue: #3483fa;
@@ -110,9 +112,6 @@ if (image && image !== "/default-og.png") {
         font-family: "Inter", system-ui, sans-serif;
         -webkit-font-smoothing: antialiased;
         color: #111827;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
       }
       .blog-container {
         max-width: 1200px;
@@ -144,72 +143,19 @@ if (image && image !== "/default-og.png") {
         display: block;
         flex-grow: 1;
       }
+      .flex {
+        display: flex;
+      }
+      .flex-col {
+        flex-direction: column;
+      }
+      .min-h-screen {
+        min-height: 100vh;
+      }
       img {
         max-width: 100%;
         height: auto;
         display: block;
-        border-radius: 8px;
-      }
-      .prose-blog {
-        max-width: none;
-        line-height: 1.625;
-        font-size: 1.125rem;
-      }
-      .prose-blog h2 {
-        font-size: 1.875rem;
-        font-weight: 700;
-        margin-top: 2rem;
-        margin-bottom: 1rem;
-        color: #111827;
-      }
-      .prose-blog p {
-        margin-bottom: 1.5rem;
-        color: #374151;
-      }
-      .prose-blog a {
-        color: #3483fa;
-        text-decoration: none;
-      }
-      .prose-blog a:hover {
-        text-decoration: underline;
-      }
-
-      /* Botão ML Style */
-      .ai-article-container a[href*="amzn.to"],
-      .ai-article-container .btn-offer,
-      .ver-oferta-btn {
-        display: block !important;
-        width: fit-content !important;
-        margin: 2rem auto !important;
-        background-color: #3483fa !important;
-        color: #fff !important;
-        padding: 12px 32px !important;
-        border-radius: 4px !important;
-        font-weight: 700 !important;
-        text-decoration: none !important;
-        box-shadow: 0 2px 8px rgba(52, 131, 250, 0.3) !important;
-        text-align: center !important;
-      }
-
-      /* Tabelas */
-      .ai-article-container table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 2rem 0;
-        border: 1px solid #e5e7eb;
-        overflow: hidden;
-        border-radius: 8px;
-      }
-      .ai-article-container th {
-        background-color: #3483fa;
-        color: #fff;
-        padding: 12px;
-        text-align: left;
-      }
-      .ai-article-container td {
-        padding: 12px;
-        border-bottom: 1px solid #f3f4f6;
-        background: #fff;
       }
     </style>
   </head>
