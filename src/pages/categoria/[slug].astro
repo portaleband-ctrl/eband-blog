@@ -3,16 +3,15 @@ import Layout from "../../layouts/Layout.astro";
 import ArticleCard from "../../components/ArticleCard.astro";
 import { supabase } from "../../lib/supabaseClient";
 
-export const prerender = false;
+export async function getStaticPaths() {
+    const { data: categories } = await supabase
+        .from("categories")
+        .select("slug");
+    return categories?.map((cat) => ({ params: { slug: cat.slug } })) || [];
+}
 
 const { slug: rawSlug } = Astro.params;
 const slug = rawSlug?.trim().toLowerCase();
-
-// Cache na Borda (Cloudflare)
-Astro.response.headers.set(
-    "Cache-Control",
-    "public, s-maxage=31536000, stale-while-revalidate=60",
-);
 
 // Fetch category data
 const { data: categoryData } = await supabase

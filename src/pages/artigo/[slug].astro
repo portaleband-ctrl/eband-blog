@@ -2,18 +2,17 @@
 import Layout from "../../layouts/Layout.astro";
 import { supabase } from "../../lib/supabaseClient";
 import { Calendar, Tag } from "lucide-react";
-import { Image } from "astro:assets";
 
-export const prerender = false;
+export async function getStaticPaths() {
+    const { data: posts } = await supabase
+        .from("posts")
+        .select("slug")
+        .eq("status", "published");
+    return posts?.map((post) => ({ params: { slug: post.slug } })) || [];
+}
 
 const { slug: rawSlug } = Astro.params;
 const slug = rawSlug?.trim().toLowerCase();
-
-// Cache na Borda (Cloudflare):
-Astro.response.headers.set(
-    "Cache-Control",
-    "public, s-maxage=31536000, stale-while-revalidate=60",
-);
 
 const { data: rawArticle } = await supabase
     .from("posts")

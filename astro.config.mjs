@@ -10,6 +10,7 @@ import cloudflare from '@astrojs/cloudflare';
 
 // https://astro.build/config
 export default defineConfig({
+  output: 'static',
   site: 'https://eband.com.br',
   adapter: cloudflare(),
   integrations: [mdx(), sitemap(), react()],
